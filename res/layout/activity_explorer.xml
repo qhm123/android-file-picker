@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <TextView
+        android:id="@+id/dir_path"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="pwd: " />
+
     <ListView
         android:id="@+id/list"
         android:layout_width="fill_parent"

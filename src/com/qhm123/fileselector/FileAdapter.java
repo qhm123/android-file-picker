@@ -2,6 +2,8 @@ package com.qhm123.fileselector;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Stack;
 
 import android.content.Context;
@@ -53,9 +55,27 @@ public class FileAdapter extends BaseAdapter {
 		CheckedTextView filename = (CheckedTextView) v
 				.findViewById(R.id.filename);
 		FileInfo fileInfo = getItem(position);
-		filename.setText(fileInfo.path);
+		filename.setText(fileInfo.name);
 
 		return v;
+	}
+
+	class SortByIsDir implements Comparator<FileInfo> {
+		public int compare(FileInfo file1, FileInfo file2) {
+			if (file1.isDir) {
+				if (file2.isDir) {
+					return 0;
+				} else {
+					return -1;
+				}
+			} else {
+				if (file2.isDir) {
+					return 1;
+				} else {
+					return 0;
+				}
+			}
+		}
 	}
 
 	public void setPath(String path, boolean inStack) {
@@ -66,6 +86,7 @@ public class FileAdapter extends BaseAdapter {
 		for (File item : file.listFiles()) {
 			mFileInfos.add(new FileInfo(item.getPath()));
 		}
+		Collections.sort(mFileInfos, new SortByIsDir());
 		notifyDataSetChanged();
 
 		if (inStack) {
@@ -73,14 +94,14 @@ public class FileAdapter extends BaseAdapter {
 		}
 	}
 
-	public boolean back() {
+	public FileInfo back() {
 		if (mPathStack.size() == 1) {
-			return false;
+			return null;
 		}
 		mPathStack.pop();
 		FileInfo fileInfo = mPathStack.peek();
 		setPath(fileInfo.path, false);
-		return true;
+		return fileInfo;
 	}
 
 }

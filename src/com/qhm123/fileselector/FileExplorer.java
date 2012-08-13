@@ -15,8 +15,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
-import android.widget.CheckedTextView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class FileExplorer extends Activity implements OnItemClickListener,
 		OnItemSelectedListener, OnClickListener {
@@ -26,6 +26,7 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 	private ListView mList;
 	private FileAdapter mFileAdapter;
 	private Button mSelectButton;
+	private TextView mCurrentDirPath;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 
 		mSelectButton = (Button) findViewById(R.id.select);
 		mSelectButton.setOnClickListener(this);
+		mCurrentDirPath = (TextView) findViewById(R.id.dir_path);
 		mList = (ListView) findViewById(R.id.list);
 		mFileAdapter = new FileAdapter(this);
 		mList.setAdapter(mFileAdapter);
@@ -44,7 +46,9 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		mList.setOnItemClickListener(this);
 		mList.setOnItemSelectedListener(this);
 
-		mFileAdapter.setPath("/sdcard", true);
+		String initPath = "/sdcard";
+		mFileAdapter.setPath(initPath, true);
+		mCurrentDirPath.setText(initPath);
 	}
 
 	@Override
@@ -57,13 +61,20 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		if (file.isDirectory()) {
 			mList.clearChoices();
 			mFileAdapter.setPath(fileInfo.path, true);
+			mList.scrollTo(0, 0);
+			mCurrentDirPath.setText(fileInfo.path);
 		}
 	}
 
 	@Override
 	public void onBackPressed() {
 		mList.clearChoices();
-		mFileAdapter.back();
+		FileInfo fileInfo = mFileAdapter.back();
+		if (fileInfo != null) {
+			mCurrentDirPath.setText(fileInfo.path);
+		} else {
+			super.onBackPressed();
+		}
 	}
 
 	@Override
