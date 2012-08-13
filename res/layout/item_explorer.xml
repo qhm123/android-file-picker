@@ -1,16 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
-<!-- android:layout_width="match_parent" -->
-<!-- android:layout_height="match_parent" -->
-<!-- android:orientation="vertical" > -->
-
-<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/filename"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-    android:gravity="center_vertical"
-    android:paddingLeft="8dip"
-    android:paddingRight="8dip"
-    android:textAppearance="?android:attr/textAppearanceListItem" />
-<!-- </LinearLayout> -->
+    android:layout_height="50dp" >
+
+    <ImageView
+        android:id="@+id/filetype"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_margin="8dp"
+        android:src="@drawable/file_icon_default" />
+
+    <TextView
+        android:id="@+id/filename"
+        android:layout_width="220dp"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/filetype"
+        android:singleLine="true"
+        android:text="filename"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/filemodifydate"
+        android:layout_width="150dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/filename"
+        android:layout_toRightOf="@id/filetype"
+        android:singleLine="true"
+        android:text="filemodifydate" />
+
+    <TextView
+        android:id="@+id/filesize"
+        android:layout_width="70dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/filename"
+        android:layout_toRightOf="@id/filemodifydate"
+        android:singleLine="true"
+        android:text="filesize" />
+
+    <CheckBox
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="8dp"
+        android:focusable="false"
+        android:padding="8dp" />
+    <!-- android:focusable="false" -->
+    <!-- android:focusableInTouchMode="false" -->
+
+</RelativeLayout>

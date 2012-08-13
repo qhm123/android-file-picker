@@ -8,11 +8,16 @@ import java.util.Stack;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckedTextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class FileAdapter extends BaseAdapter {
 
@@ -22,12 +27,24 @@ public class FileAdapter extends BaseAdapter {
 
 	private Stack<FileInfo> mPathStack = new Stack<FileInfo>();
 
+	private SparseBooleanArray mCheckedArray = new SparseBooleanArray();
+
 	private Context mContext;
 	private LayoutInflater mLayoutInflater;
+
+	private ItemCheckListener mItemCheckListener;
+
+	public interface ItemCheckListener {
+		void onItemCheckListener(int position, boolean isChecked);
+	}
 
 	public FileAdapter(Context context) {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(context);
+	}
+
+	public void setItemCheckListener(ItemCheckListener l) {
+		mItemCheckListener = l;
 	}
 
 	@Override
@@ -45,6 +62,10 @@ public class FileAdapter extends BaseAdapter {
 		return 0;
 	}
 
+	public SparseBooleanArray getCheckedItemPositions() {
+		return mCheckedArray;
+	}
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
@@ -52,13 +73,46 @@ public class FileAdapter extends BaseAdapter {
 			v = mLayoutInflater.inflate(R.layout.item_explorer, null);
 		}
 
-		CheckedTextView filename = (CheckedTextView) v
-				.findViewById(R.id.filename);
 		FileInfo fileInfo = getItem(position);
+		fileInfo.position = position;
+
+		TextView filename = (TextView) v.findViewById(R.id.filename);
 		filename.setText(fileInfo.name);
+		TextView filemodifydate = (TextView) v
+				.findViewById(R.id.filemodifydate);
+		filemodifydate.setText(fileInfo.lastModified);
+		TextView filesize = (TextView) v.findViewById(R.id.filesize);
+		filesize.setText(fileInfo.size);
+		ImageView icon = (ImageView) v.findViewById(R.id.filetype);
+		icon.setImageResource(fileInfo.isDir ? R.drawable.folder
+				: R.drawable.file_icon_default);
+		CheckBox checkbox = (CheckBox) v.findViewById(R.id.checkbox);
+		checkbox.setOnCheckedChangeListener(null);
+		checkbox.setTag(fileInfo);
+		checkbox.setChecked(getItem(position).isChecked);
+		checkbox.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
 		return v;
 	}
+
+	OnCheckedChangeListener mOnCheckedChangeListener = new OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+			FileInfo fileInfo = (FileInfo) buttonView.getTag();
+			fileInfo.isChecked = isChecked;
+			int p = fileInfo.position;
+			if (isChecked) {
+				mCheckedArray.put(p, true);
+			} else {
+				mCheckedArray.delete(p);
+			}
+
+			if (mItemCheckListener != null) {
+				mItemCheckListener.onItemCheckListener(p, isChecked);
+			}
+		}
+	};
 
 	class SortByIsDir implements Comparator<FileInfo> {
 		public int compare(FileInfo file1, FileInfo file2) {

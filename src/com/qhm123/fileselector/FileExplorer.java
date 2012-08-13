@@ -3,6 +3,8 @@ package com.qhm123.fileselector;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.qhm123.fileselector.FileAdapter.ItemCheckListener;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -19,7 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class FileExplorer extends Activity implements OnItemClickListener,
-		OnItemSelectedListener, OnClickListener {
+		OnItemSelectedListener, OnClickListener, ItemCheckListener {
 
 	private static final String TAG = FileExplorer.class.getSimpleName();
 
@@ -37,11 +39,14 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		mSelectButton = (Button) findViewById(R.id.select);
 		mSelectButton.setOnClickListener(this);
 		mCurrentDirPath = (TextView) findViewById(R.id.dir_path);
-		mList = (ListView) findViewById(R.id.list);
+
 		mFileAdapter = new FileAdapter(this);
+		mFileAdapter.setItemCheckListener(this);
+
+		mList = (ListView) findViewById(R.id.list);
 		mList.setAdapter(mFileAdapter);
 		mList.setFastScrollEnabled(true);
-		mList.setItemsCanFocus(false);
+		// mList.setItemsCanFocus(false);
 		mList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		mList.setOnItemClickListener(this);
 		mList.setOnItemSelectedListener(this);
@@ -94,7 +99,8 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		case R.id.select:
 			Intent data = new Intent(getIntent());
 			ArrayList<Uri> files = new ArrayList<Uri>();
-			SparseBooleanArray positions = mList.getCheckedItemPositions();
+			SparseBooleanArray positions = mFileAdapter
+					.getCheckedItemPositions();
 			for (int i = 0; i < positions.size(); i++) {
 				int position = positions.keyAt(i);
 				Log.d(TAG, "position: " + position);
@@ -107,5 +113,10 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		default:
 			break;
 		}
+	}
+
+	@Override
+	public void onItemCheckListener(int position, boolean isChecked) {
+
 	}
 }
