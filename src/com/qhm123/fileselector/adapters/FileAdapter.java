@@ -1,4 +1,4 @@
-package com.qhm123.fileselector;
+package com.qhm123.fileselector.adapters;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,20 +19,23 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.qhm123.fileselector.FileInfo;
+import com.qhm123.fileselector.R;
+
 public class FileAdapter extends BaseAdapter {
 
-	private static final String TAG = FileAdapter.class.getSimpleName();
+	protected static final String TAG = FileAdapter.class.getSimpleName();
 
-	private ArrayList<FileInfo> mFileInfos = new ArrayList<FileInfo>();
+	protected ArrayList<FileInfo> mFileInfos = new ArrayList<FileInfo>();
 
-	private Stack<FileInfo> mPathStack = new Stack<FileInfo>();
+	protected Stack<FileInfo> mPathStack = new Stack<FileInfo>();
 
 	private SparseBooleanArray mCheckedArray = new SparseBooleanArray();
 
-	private Context mContext;
-	private LayoutInflater mLayoutInflater;
+	protected Context mContext;
+	protected LayoutInflater mLayoutInflater;
 
-	private ItemCheckListener mItemCheckListener;
+	protected ItemCheckListener mItemCheckListener;
 
 	public interface ItemCheckListener {
 		void onItemCheckListener(int position, boolean isChecked);
@@ -87,12 +90,20 @@ public class FileAdapter extends BaseAdapter {
 		icon.setImageResource(fileInfo.isDir ? R.drawable.folder
 				: R.drawable.file_icon_default);
 		CheckBox checkbox = (CheckBox) v.findViewById(R.id.checkbox);
-		checkbox.setOnCheckedChangeListener(null);
-		checkbox.setTag(fileInfo);
-		checkbox.setChecked(getItem(position).isChecked);
-		checkbox.setOnCheckedChangeListener(mOnCheckedChangeListener);
+		if (!isCheckBoxVisibile()) {
+			checkbox.setVisibility(View.GONE);
+		} else {
+			checkbox.setOnCheckedChangeListener(null);
+			checkbox.setTag(fileInfo);
+			checkbox.setChecked(getItem(position).isChecked);
+			checkbox.setOnCheckedChangeListener(mOnCheckedChangeListener);
+		}
 
 		return v;
+	}
+
+	protected boolean isCheckBoxVisibile() {
+		return true;
 	}
 
 	OnCheckedChangeListener mOnCheckedChangeListener = new OnCheckedChangeListener() {
@@ -138,6 +149,9 @@ public class FileAdapter extends BaseAdapter {
 		File file = new File(path);
 		Log.d(TAG, "size: " + file.listFiles());
 		for (File item : file.listFiles()) {
+			if (!item.canRead() && item.isDirectory()) {
+				continue;
+			}
 			mFileInfos.add(new FileInfo(item.getPath()));
 		}
 		Collections.sort(mFileInfos, new SortByIsDir());

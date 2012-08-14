@@ -15,19 +15,21 @@
         tools:context=".MainActivity" />
 
     <Button
+        android:id="@+id/select_single_file"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="open select single file" />
+
+    <Button
         android:id="@+id/select_file"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="open select file" />
+        android:text="open select multiple file" />
 
     <Button
         android:id="@+id/select_dir"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/select_content"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="open select dir" />
 
 </LinearLayout>

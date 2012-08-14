@@ -3,8 +3,6 @@ package com.qhm123.fileselector;
 import java.io.File;
 import java.util.ArrayList;
 
-import com.qhm123.fileselector.FileAdapter.ItemCheckListener;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,20 +13,31 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.qhm123.fileselector.adapters.DirFileAdapter;
+import com.qhm123.fileselector.adapters.FileAdapter;
+import com.qhm123.fileselector.adapters.FileAdapter.ItemCheckListener;
+import com.qhm123.fileselector.adapters.MultiFileAdapter;
+import com.qhm123.fileselector.adapters.SingleFileAdapter;
+
 public class FileExplorer extends Activity implements OnItemClickListener,
-		OnItemSelectedListener, OnClickListener, ItemCheckListener {
+		OnClickListener, ItemCheckListener {
 
 	private static final String TAG = FileExplorer.class.getSimpleName();
+
+	private static final int MODE_SINGLE = 0;
+	private static final int MODE_MULTIPLE = 1;
+	private static final int MODE_DIR = 2;
 
 	private ListView mList;
 	private FileAdapter mFileAdapter;
 	private Button mSelectButton;
 	private TextView mCurrentDirPath;
+
+	private int mMode = MODE_MULTIPLE;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +49,27 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		mSelectButton.setOnClickListener(this);
 		mCurrentDirPath = (TextView) findViewById(R.id.dir_path);
 
-		mFileAdapter = new FileAdapter(this);
+		String action = getIntent().getAction();
+		if (Actions.SINGLE.equals(action)) {
+			mMode = MODE_SINGLE;
+			mFileAdapter = new SingleFileAdapter(this);
+		} else if (Actions.MULTIPLE.equals(action)) {
+			mMode = MODE_MULTIPLE;
+			mFileAdapter = new MultiFileAdapter(this);
+		} else if (Actions.DIR.equals(action)) {
+			mMode = MODE_DIR;
+			mFileAdapter = new DirFileAdapter(this);
+		}
+		Log.d(TAG, "action: " + action + ", mode: " + mMode);
 		mFileAdapter.setItemCheckListener(this);
 
 		mList = (ListView) findViewById(R.id.list);
 		mList.setAdapter(mFileAdapter);
 		mList.setFastScrollEnabled(true);
 		// mList.setItemsCanFocus(false);
-		mList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		// mList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		mList.setOnItemClickListener(this);
-		mList.setOnItemSelectedListener(this);
+		// mList.setOnItemSelectedListener(this);
 
 		String initPath = "/sdcard";
 		mFileAdapter.setPath(initPath, true);
@@ -68,6 +88,14 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 			mFileAdapter.setPath(fileInfo.path, true);
 			mList.scrollTo(0, 0);
 			mCurrentDirPath.setText(fileInfo.path);
+		} else {
+			if (mMode == MODE_SINGLE) {
+				Intent data = new Intent(getIntent());
+				Uri uri = Uri.parse(mFileAdapter.getItem(position).path);
+				data.putExtra("file", uri);
+				setResult(RESULT_OK, data);
+				finish();
+			}
 		}
 	}
 
@@ -78,19 +106,9 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		if (fileInfo != null) {
 			mCurrentDirPath.setText(fileInfo.path);
 		} else {
+			setResult(RESULT_CANCELED);
 			super.onBackPressed();
 		}
-	}
-
-	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int position,
-			long id) {
-		Log.d(TAG, "onItemSelected");
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> parent) {
-		Log.d(TAG, "onNothingSelected");
 	}
 
 	@Override
