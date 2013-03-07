@@ -8,13 +8,15 @@
         android:id="@+id/dir_path"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:text="pwd: " />
 
     <ListView
         android:id="@+id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:headerDividersEnabled="true" />
 
     <Button
         android:id="@+id/select"

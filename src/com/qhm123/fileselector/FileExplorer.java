@@ -53,6 +53,7 @@ public class FileExplorer extends Activity implements OnItemClickListener,
 		if (Actions.SINGLE.equals(action)) {
 			mMode = MODE_SINGLE;
 			mFileAdapter = new SingleFileAdapter(this);
+			mSelectButton.setVisibility(View.GONE);
 		} else if (Actions.MULTIPLE.equals(action)) {
 			mMode = MODE_MULTIPLE;
 			mFileAdapter = new MultiFileAdapter(this);
